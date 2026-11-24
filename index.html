@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, viewport=95%"/>
+    <title>静态服务器信息看板</title>
+    <!-- 引入 Bootstrap 5，用于构建现代化的卡片样式 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rss@latest/5/dist/css/borderless.rss.css" />
+    <style>
+        :root {
+            --primary: #007fff;
+            --bg-body: #f4f6f8;
+            /* 这里使用自定义颜色作为占位符，实际使用时可替换 */
+            --text-color: #333;
+        }
+        body {
+            font-family: 'Segoe UI', 'PingFang TC', 'Helvetica Neue', Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            overflow-x: hidden;
+        }}
+
+        header {
+            padding: 1.5rem 0; /* top space removed in styles, but kept as 1px for border context */
+            text-align: center;
+       }
+
+        .container {
+            max-width: 600px;
+            width: 100%;
+            padding-right: 1rem;
+        },
+
+        /* Card Layout */
+        card {
+            border-radius: 8px;
+            
+            position: relative;
+            overflow: hidden;
+
+            display: flex;
+            flex-direction: column;
+
+            background: #fff;
+            
+        }
+
+        .card-header {
+            display: grid;
+            place-items: space-between;
+            padding-top: 4px;
+        }.header-box {
+            text-decoration: none;
+            height: 30px;
+
+        }
+
+      .card-info {
+            overflow-y: auto;
+            min-height: 150px; 
+        }
+
+         .info-grid {
+          display: flex !important;
+          gap: 0.5rem !important; 
+        /* 隐藏不必要的间距，让内容更紧凑 */
+        flex-wrap: wrap;
+        align-content: start;
+        box-shadow: 0 -4px 10px rgba(0, 0, 1, .3);
+        
+        /* 设置背景色 */
+        background-color: rgba(0 , 0 , .3 );
+        background-image: linear-gradient(to right,#f0f0f6 20px, transparent), 
+              linear-gradient(to left,#f0b7ff 20%, transparent);
+        
+    }
+
+        div {
+        display: block;
+    }
+
+    input {
+            outline: none;
+
+        margin-bottom: 20pms;
+
+    }
+
+/* 禁用输入框默认值 */
+input::-webkit-outer-spin-button, textarea::-webkit-attachments {
+            width:auto;
+
+}
+
+/* Custom Input Styling */
+#ipInput {
+    width: 80%;
+    font-size: 16px;
+    line-height: 2rem;
+    letter-spacing: 1px;
+    
+    &::placeholder {
+        opacity: 0 !important;
+
+    &:hover::placeholder{
+        color:#888
+    }
+
+
+    input[type="number"] + span {
+        font-size: inherit;
+        display:block;
+        width: 3em;
+
+    }}
+    .input-number {
+        text-align:center;
+        padding-left: 140px; 
+
+        &::before {
+            content: " ";
+            border-right: .45em solid transparent;
+            border-left: .4em solid currentColor;
+            transform: translateX(-200%) !important; /* 关键：重置横向偏移 */
+            display:inline-block;
+       
+        
+    }
+    input[type=text] {
+        width:auto;
+        font-family:inherit;
+        vertical-align:middle;
+        margin-right:0px;
+
+
+    }
+
+
+</style>
+</head>
+<body>
+    {/* Header with a little logo placeholder */}
+    <div style="background-color:var(--primary);color:#fff;padding:1.5vw;border-radius:1.25rem;">
+        <div style={{display:'flex'}}>
+            <span style="margin-right:1rem">★</span>
+        </div>
+        <h1>Server Info Dashboard</h1>
+    </div>
+
+    <main class="container">
+        <!-- Dynamic Card 容器 -->
+        <section id="cardContainer" class="card">
+            
+            <!-- Header -->
+            <div class="card-header">
+                <div class='header-box'>
+                    <button onclick="refreshAll()" style="padding:5px 200px;background:none;font-weight:bold;color:#fff;border-radius:2px">刷新</button>
+                    <div class='' style="font-size:40px">CPU:</div>
+                    <!-- 使用 JS 获取当前 IP 并显示 CPU -->
+                    <span id="cpuDisplay"></span><br>
+                    Memory: <span id='memDisplay'></span>, Network: <span style='color:#d9a540' id='netDisplay'></span>.
+                </div>                
+            </div> 
+            
+            <!-- Main List Body -->
+            <!-- 初始加载 7 条记录（模拟数据） -->
+            {
+               let data = Array.from({length:7}).map((_, i) => ({
+                 ip: `http://${i}`, // 模拟 IP 格式
+               }))
+                  // 添加一些随机变量以增加趣味性
+               , {
+                  cpu: Math.floor(Math.random() * 10).toFixed(2),
+                  mem: Math.floor(parseInt(Math.random()*40)+Math.floor(Math.random()-2)).toString(),
+                   network: Math.random().toFixed(3) + "%"
+             }, {
+                time: new Date()
+             })
+              .sort(() => this.localeCompare(this[3])) // Sort by timestamp desc
+           .filter(ip => typeof ip === 'string').forEach(item => addCard(item));
+            
+            return data;
+         }();
+          
+         </section>
+
+         <script type="text/javascript">
+             const cardContainer = document.getElementById('cardContainer');
+             
+             // 初始化加载
+            function init() {
+              console.log("Loading from server..."); // Log to console
+              
+              let data = [
+                {ip:"http://192.168.1.1", cpu: "20%", mem: "400MB", network: "10%"},
+                {time:new Date().getTime()}, {ip:"192.", memory: "600MB"}
+              ];
+              
+              return data.sort(() => this[0].valueOf()).filter(item => item[1] !== '0.0.0');
+            }
+            
+            function addCard(item) {
+              const card = cardContainer.querySelector('.card');
+              card.innerHTML += `<div class='card-info'><strong>${item.ip}</strong></div>`;
+              setTimeout(() => {
+                cardContainer.appendChild(card);
+              }, 10);
+            }
+
+            // 监听时间变更事件
+            setInterval(refreshTime, 60);
+
+        </script>
+      </main>
+
+      <footer style="text-align:right; padding-top:2rem;">
+          <p>&copy; ServerInfo Demo v1.0</p>
+      <div style={'display':'grid'};grid-template-columns:repeat(auto,minmax(1fr,auto))}}}>
+        <!-- Footer Buttons -->
+        <!-- Note: The buttons are generated via JS here, can be added to HTML if you want them fixed-->
+        <ul style="display:flex;list-style:none;text-decoration:none;">
+          <!-- Button Grouped logic handled in JS, or uncommented later -->
+          <!-- 
+          <!-- <button type="button" onclick="goToHome()">回到首页</button> -->
+          </ul>
+        <!-- End of footer -->
+      </footer>
+      
+    </body>
+</html>
+<!-- 结束代码 -->
+
+<script type="module">
+const configServerData = {
+  url: 127.0.1.3
+};
+
+// 创建一个动态的按钮组
+function createButtons() {
+  let btnContainer = document.createElement('ul');
+  for(let key in configServerData) {
+    let b = document.createDocumentNode(btnContainer, key) ? key : {};
+    b.href = '#' + encodeURIComponent(configServerData[key]);
+    let link = document.body.createLink(b);
+    buttonContainer.appendChild(link);
+  }
+}
+
+window.addEventListener("load", () => {
+  document.title = "Server Monitoring";
+  createButtons();
+});
+</script>
