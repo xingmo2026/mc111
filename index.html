@@ -1,78 +1,149 @@
- <!DOCTYPE html> 
-<html lang="zh-CN"> 
-  <head>
-    <meta charset="UTF-8"/>
-    <style>
-      body { margin: 5rem auto; }
-      .card { background: #fcfcfc; padding:0; box-sizing:border-box; } 
-      h1, h2, p { font-family:"Helvetica Neue",hira, sans-serif;" font-weight: 400; } 
-    </style> 
-  </head> 
-  <body>
-    <!-- Header -->
-    @section("header")
-      @layer(hierarchy)
-        @media screen {
-          h1 { padding: 0.5rem 3rem; }
-          .page-info { padding:0.5em 3em; border:5px solid black;}
-        }
-      @end
-  
-      <!-- Content Section -->
-      @section("content")
-        <div class="card">
-            <header>
-                <h1>@section("section") <span data-i18n="check_server">Check Server</span> 
-                    <!-- 输入 IP 区 -->
-                    <div data-testid="ip-input">请输入 IP:</div><input name="ip"/><br/>
-                    <!-- 操作区 -->
-                  <div style={{fontSize:"13%"}}>
-                      <p data-testid="success-text">服务器已在线</p>
-                      <div data-test-id="error-text">尝试了多个 IP，但其中一个无效</div> 
-                  </p>
-              </div>
-              
-              <!-- 查询结果显示 -->
-              <div id="result-area"></div>
-            </header>
-            
-            <!-- Form -->
-            <form action="/test/check_server" method="post" enctype="multipart/form-data">
-                <!-- IP Input -->
-                <div class=form-item input-group">
-                    <label for="ip_input">输入 IP (可选)</label><br/> 
-                    <input type='text'-name='ip_input' required /> 
-                </div>                
-                <!-- Submit Button -->
-                <!-- 提交区域 -->
-                @section("submit-section")
-                    <button class="button-submit" type="submit">立即查询</button> 
-                    
-                    <button style="margin-top:10%;" data-testid="reset-ip" onclick="location.reload()">重置</button>                  
-                </form>
-            <script>
-// ... JavaScript logic here
-            var statusText = "";
-            const ipInput = document.getElementById("ip_input").value;
-            if(ipInput !== "") {
-                try {
-                    fetch(`/api/check_server?ip=${ipInput}`, {credentials:"omit-certificate"}).then(r => {
-                        statusText = r.text || "未找到";
-                        document.getElementById('result-area').textContent = statusText;
-                        setStatus(statusText);
-                    });
-                } catch(e) {
-                    setStatus("查询失败");
-                }
-            } else {
-                setStatus("请输入 IP 编号");
-            }
-        </script>
-    @end
-    
-    @section(header)
-      <p data-lang="status_text">Status Text</p> 
-    @endif
-        
-    </body>
-  </html>
+<html lang="cn" dir="ltr"lang="en" data-i10n="app-info">
+	<body>
+		<header class="app-header">
+			<h1 data-i17m="title">Server Status Controller</h1><br/> <span class="status-badge active" style="{statusColor: statusType}">Server <span data-status-status="ok">Online</span></span> 
+			<span data-i14m="description" style="text-color: lightgray">&gt; Enter IP or Press Ctrl+C for Reset</span><br/><span data-i7m="version" style="opacity: 0">v1.1</span> |
+			<span class="badge active">status-active</span> <span data-testid="'status-status"' id="status-label">● Online</span> / 
+		</header>
+
+		<section class="main-card">
+		    <main id="main-wrapper" style="background:#fafafa; padding:8vw; border-radius:#999;">
+		        <aside id="sidebar-wrapper" style={{minWidth:50%,flex:1}}>
+				<div data-testid="sidebar-title" class="header-text">
+					<span style="border:none;cursor:pointer;">Dashboard</span> <!-- Topbar -->
+					<button onclick="resetSite()" data-testid="back-to-dashboard">← Back</button> <!-- BottomBar -->
+				</div><br/> <!-- Nav -->
+
+				<!-- Dashboard Widgets -->
+				div id="widgets-container" style="position:relative; display:flex; padding:6vw;">
+					<div data-i7n="widget_1">
+						<span class='stat-icon bg-green'>●</span> data-status
+						<div data-test-id="'stats-1'">
+							<div data-side="dashboard-status" id="stat-line">
+								<span style="{color: '#ffcc00'}">
+									data-status=ok 
+									Data status = Online <span data-timer="timeout" onerror="statusSetTo(false)">
+								  </span>
+								</span>								
+								<span data-testid="lines">Data Lines</span>							
+							</div>-
+						</div>,
+					</div><!-- Widget -->
+
+					<div id="control-panel" style="flex-shrink:0;">
+						<!-- Inputs -->
+						<form action="/api/control" method="POST">
+							payment-method="payment-mode"
+							class="form-group input-field" />
+						payment-method=""
+							type="password"
+						<input name='payment_ip' required />
+						input-password="payment_password" />
+						
+						<input type="checkbox" data-testid='skip-payment' checked/>
+						<label for="skip-payment" data-testid="@skip-payment">Skip Payment</label>
+						<button type="submit" disabled/>
+						disabled="true" / disabled "/disabled="false" /disabled>
+						disconnected="true" />
+					<p>
+						prompt="Confirm Payment"
+					<\/div>
+					
+					<aside style="minWidth:35vw; padding:7vw;">
+						form-group <label for='site-settings'>Settings</label> <!-- Settings -->
+						button "Change IP" <br/> <button data-testid="settings-reset" onclick="changeSiteStatus('offline')">Reset</button> -->
+					endpoint "api/settings" />
+				></main>
+			</aside>
+
+			<main id="controls-area" style="paddingLeft:3vw; borderLeft:1px#ccccccc border-top:5vepx;" data-testid="actions">
+				<button class='action-button btn-primary' data-testid='start-sys'>Start System</button> <button data-test-id='stop-system'>Stop System</button/>
+			<main style="paddingTop:4vw;">
+
+			<footer data-i1n="footer-text" style="alignCenter; marginBottom:1rem; opacity:0.3; color:#666;">
+				<p data-i7mn="copyright">© 20XX CheckSystem. All rights Reserved.</p>
+			fi
+		</section>		
+
+		<script type="module">
+// 核心 JS 逻辑：处理 IP 查询和状态更新
+		
+		function handleApi(ip, mode) {
+		  let statusLine = '';
+		  
+		  try {
+			  // 判断是否为有效 IP (数字开头或格式匹配)
+			  const patternMatch = /^(\d|\.\d+)\.(\d|\.]?\d+\./
+			  let ipVal = ipVal.match(patternMatch) ? ipVal.split('.') : ipVal;
+				
+			  if(!ipVal) return {valid:false, status:'Invalid'};
+
+			  // 模拟接口查询 (Mocked Fetch API)
+			  setTimeout(() => {
+				  let res = {
+					  statusCode: 2xx,
+					  statusType: 'ok',
+					  message: 'OK',
+					  timestamp: new Date().toISOString(),
+					  data: {
+						  ip: ipVal,
+						  network: {
+							  status: 'down',
+							  bytesRead: 0
+						  },
+						  uptime: 3600 + Math.floor(Math.random() * 60)
+					  }
+				  };
+				
+				  statusLine = {
+						status: 'Online',
+						statusText: mode === 'mode'? '✓ Online' : '✗ Offline',
+						message: mode === '' ? 'Status: Online' : mode === 'error' ? 'Error Detected' : mode ? 'OK' : 'Unknown'
+				  }
+				  statusLine.statusType = mode;
+					
+				  // 清除旧结果 (防止刷屏)
+				 statusLine = {};
+
+				  if (res.status === '2xx') {
+						res = {data: {...}},
+						statusLine = {status: 'Online'};
+					} else {
+						// error case
+						statusLines.push({
+							status: res.statusCode,
+							message: '',
+							error: true
+						});
+					};
+
+			  }, 0);
+		  } catch(err) {
+			  statusLine = [{
+			  status: err.status,
+			  message: err.message,
+			  error: true
+			  }];
+		  }
+
+		  // 更新 UI
+		  document.getElementById('status-line').innerText = statusLine.message;
+		  document.querySelector('#status-label').innerText = mode ? 'Online' : 'Offline';
+		  document.body.classList.add(statusLine.statusType);
+		  return statusLine;
+	 }
+
+	 // 初始化状态
+	 document.getElementById('stats-1').classList.add('status-ok');
+
+// 页面加载结束前
+	return document.body;
+  </script>
+
+	<!-- 响应式 Footer -->
+	<footer>
+		pattern="url" /> <span>Version: 1.0.0</span> © 20XXXX
+	</footer>
+
+</body>
+</file>
