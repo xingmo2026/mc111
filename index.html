@@ -1,253 +1,93 @@
-<!DOCTYPE html>
-<html lang="zh-CN">
+<!DOCTYPE html><html lang='zh-CN' dir='rtl'>
 <head>
-    <meta charset="UTF-8" name="viewport" content="width=device-width, viewport=95%"/>
-    <title>静态服务器信息看板</title>
-    <!-- 引入 Bootstrap 5，用于构建现代化的卡片样式 -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-rss@latest/5/dist/css/borderless.rss.css" />
-    <style>
-        :root {
-            --primary: #007fff;
-            --bg-body: #f4f6f8;
-            /* 这里使用自定义颜色作为占位符，实际使用时可替换 */
-            --text-color: #333;
-        }
-        body {
-            font-family: 'Segoe UI', 'PingFang TC', 'Helvetica Neue', Arial, sans-serif;
-            margin: 0;
-            background-color: var(--bg-body);
-            color: var(--text-color);
-            overflow-x: hidden;
-        }}
-
-        header {
-            padding: 1.5rem 0; /* top space removed in styles, but kept as 1px for border context */
-            text-align: center;
-       }
-
-        .container {
-            max-width: 600px;
-            width: 100%;
-            padding-right: 1rem;
-        },
-
-        /* Card Layout */
-        card {
-            border-radius: 8px;
-            
-            position: relative;
-            overflow: hidden;
-
-            display: flex;
-            flex-direction: column;
-
-            background: #fff;
-            
-        }
-
-        .card-header {
-            display: grid;
-            place-items: space-between;
-            padding-top: 4px;
-        }.header-box {
-            text-decoration: none;
-            height: 30px;
-
-        }
-
-      .card-info {
-            overflow-y: auto;
-            min-height: 150px; 
-        }
-
-         .info-grid {
-          display: flex !important;
-          gap: 0.5rem !important; 
-        /* 隐藏不必要的间距，让内容更紧凑 */
-        flex-wrap: wrap;
-        align-content: start;
-        box-shadow: 0 -4px 10px rgba(0, 0, 1, .3);
-        
-        /* 设置背景色 */
-        background-color: rgba(0 , 0 , .3 );
-        background-image: linear-gradient(to right,#f0f0f6 20px, transparent), 
-              linear-gradient(to left,#f0b7ff 20%, transparent);
-        
-    }
-
-        div {
-        display: block;
-    }
-
-    input {
-            outline: none;
-
-        margin-bottom: 20pms;
-
-    }
-
-/* 禁用输入框默认值 */
-input::-webkit-outer-spin-button, textarea::-webkit-attachments {
-            width:auto;
-
-}
-
-/* Custom Input Styling */
-#ipInput {
-    width: 80%;
-    font-size: 16px;
-    line-height: 2rem;
-    letter-spacing: 1px;
-    
-    &::placeholder {
-        opacity: 0 !important;
-
-    &:hover::placeholder{
-        color:#888
-    }
-
-
-    input[type="number"] + span {
-        font-size: inherit;
-        display:block;
-        width: 3em;
-
-    }}
-    .input-number {
-        text-align:center;
-        padding-left: 140px; 
-
-        &::before {
-            content: " ";
-            border-right: .45em solid transparent;
-            border-left: .4em solid currentColor;
-            transform: translateX(-200%) !important; /* 关键：重置横向偏移 */
-            display:inline-block;
-       
-        
-    }
-    input[type=text] {
-        width:auto;
-        font-family:inherit;
-        vertical-align:middle;
-        margin-right:0px;
-
-
-    }
-
-
+<style>
+/* 基础样式 */
+body { font-family: Arial, sans-serif; padding: 50px; background-color: #f5f5f6; margin: 0; }
+.list-header { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; min-width: 200px;}
+.list-body { background: white; padding:20px; border-radius:10px; width:95%; box-shadow:0 1px 3px rgba(0,0,0,.2); overflow-y:auto;}
+/* 表单区域 */
+.form-group { margin-bottom:15px; padding:10xpx border:1px solid #d9d9dcd; border-right:0px border-left:0px;border-radius:15xpx;font-size:150% }
+/* 表格区域 */
+.table-container { overflow-x:hidden; }
+/* CSS 样式 */
+.btn-form { padding:15vwpx font-size:13vh; cursor:pointer; text-align:center;}
+.btn-action { padding:5px10px font-weight:bold; color:black; background:#d9d1db border-radius:7vwpx; margin-top:5px; width:auto;}
+.form-control { border:15%px border-color:black; background:white; padding:5vwpx border-radius:5vpx; font-size:3vh;}
+.table-cell { vertical-align: top; padding:3vpx border; background:white border-radius:3vhpx !important; border-collapse:collapse; }
+table td { white-space:nowrap; padding:4vwpx border-collapse;border; }
 </style>
 </head>
 <body>
-    {/* Header with a little logo placeholder */}
-    <div style="background-color:var(--primary);color:#fff;padding:1.5vw;border-radius:1.25rem;">
-        <div style={{display:'flex'}}>
-            <span style="margin-right:1rem">★</span>
-        </div>
-        <h1>Server Info Dashboard</h1>
-    </div>
+<div class='main'>
+<h1 style='text-align:left;margin:15vhpx'><strong>个人清单</strong></h1>
+<form action='/list/save.php' method='post'>
+<input type='text' name='name' />
+<span style='color:darkgray'>*</span><br/>
+<input type=\"number\" step=\"any\" name='amount' autocomplete='off'/>
+<select data-key='dept'>
+<option value='' disabled>请选择部门</option>
+<option value='科技'>科技部</option> <option value='工程'>工程组</option> 
+<option value='销售'>销售部</option> </select>
+<textarea data-key='description'>描述内容</textarea></form>
 
-    <main class="container">
-        <!-- Dynamic Card 容器 -->
-        <section id="cardContainer" class="card">
-            
-            <!-- Header -->
-            <div class="card-header">
-                <div class='header-box'>
-                    <button onclick="refreshAll()" style="padding:5px 200px;background:none;font-weight:bold;color:#fff;border-radius:2px">刷新</button>
-                    <div class='' style="font-size:40px">CPU:</div>
-                    <!-- 使用 JS 获取当前 IP 并显示 CPU -->
-                    <span id="cpuDisplay"></span><br>
-                    Memory: <span id='memDisplay'></span>, Network: <span style='color:#d9a540' id='netDisplay'></span>.
-                </div>                
-            </div> 
-            
-            <!-- Main List Body -->
-            <!-- 初始加载 7 条记录（模拟数据） -->
-            {
-               let data = Array.from({length:7}).map((_, i) => ({
-                 ip: `http://${i}`, // 模拟 IP 格式
-               }))
-                  // 添加一些随机变量以增加趣味性
-               , {
-                  cpu: Math.floor(Math.random() * 10).toFixed(2),
-                  mem: Math.floor(parseInt(Math.random()*40)+Math.floor(Math.random()-2)).toString(),
-                   network: Math.random().toFixed(3) + "%"
-             }, {
-                time: new Date()
-             })
-              .sort(() => this.localeCompare(this[3])) // Sort by timestamp desc
-           .filter(ip => typeof ip === 'string').forEach(item => addCard(item));
-            
-            return data;
-         }();
-          
-         </section>
+<!-- 操作功能区 -->
+<button data-key='add-btn' onclick='window.location.href=\'list.html\''>➕</button><br/>
 
-         <script type="text/javascript">
-             const cardContainer = document.getElementById('cardContainer');
-             
-             // 初始化加载
-            function init() {
-              console.log("Loading from server..."); // Log to console
-              
-              let data = [
-                {ip:"http://192.168.1.1", cpu: "20%", mem: "400MB", network: "10%"},
-                {time:new Date().getTime()}, {ip:"192.", memory: "600MB"}
-              ];
-              
-              return data.sort(() => this[0].valueOf()).filter(item => item[1] !== '0.0.0');
-            }
-            
-            function addCard(item) {
-              const card = cardContainer.querySelector('.card');
-              card.innerHTML += `<div class='card-info'><strong>${item.ip}</strong></div>`;
-              setTimeout(() => {
-                cardContainer.appendChild(card);
-              }, 10);
-            }
-
-            // 监听时间变更事件
-            setInterval(refreshTime, 60);
-
-        </script>
-      </main>
-
-      <footer style="text-align:right; padding-top:2rem;">
-          <p>&copy; ServerInfo Demo v1.0</p>
-      <div style={'display':'grid'};grid-template-columns:repeat(auto,minmax(1fr,auto))}}}>
-        <!-- Footer Buttons -->
-        <!-- Note: The buttons are generated via JS here, can be added to HTML if you want them fixed-->
-        <ul style="display:flex;list-style:none;text-decoration:none;">
-          <!-- Button Grouped logic handled in JS, or uncommented later -->
-          <!-- 
-          <!-- <button type="button" onclick="goToHome()">回到首页</button> -->
-          </ul>
-        <!-- End of footer -->
-      </footer>
-      
-    </body>
+<!-- 表格显示部分 -->
+<table id='table' class='list-table'>
+<tr><th colspan='1'>姓名</th><th>部门</th><span data-key='contact'>联系电话</span><th><span class='date-name'>日期</span>&nbsp;</th>
+<tr><td><td><th rowspan='1'><strong>岗位</strong></td><td style='font-weight:bold'>工资</td></tr>
+<tr>
+<td>张三</td><td data-key='depts'>科技部 &nbsp;&nbsp;<span style='border:none;background:white;border:1px black'>科技部&nbsp;&nbsp; 科技人</span>&lt;<strong style='border:1px dashed black;'>科技人</strong>;数据为必填项</td><th style='padding-right:10vwpx'>张三</th> <th style='border-radius:5vhpx'>科技人</th>
+<td data-key='salary'>工资</th><td data-k=<span class='active-name'>1</span><td style='.val'>1</td>
+</tr>
+</tbody><thead>
+<table>
+<th>姓名</th> 
+<th data-key='names'>职位</th> <!-- data-key='values' -->
+<th class='col'>部门</th><!-- data-key='keys' -->
+<td colspan='3'>薪资</td><span class=data-key='dates'></span>
+</tfoot>
+</thead></table>
+<br/><br/>
+<hr/>
+<table id='#table'>
+<thead>
+<tbody>
+<tr data-key="rows">
+<tr><span style='vertical-align: top'>姓名：</span><td></td><span style="border-radius:4px">1</span></td><th data-key='keywords'>科技人<span style='border-right:1px darkblue'>科技人 - 部门名称</span>(<span style='margin-left:3vwpx'>部门</span>)&nbsp;&lt;/th><span style='{border:1vwpx}' data-key='contacts'>联系人</span><span style={'border-radius':5vhpx};background:{white}; padding:3vh}px">{1}.css</span><script>document.body.style.marginRight=10px"/></td><span><div data-key='key'>总人数</div></tr><tr><td><div style='padding-top:5vw'>张三&#10;李四</div><div style={'padding-top':3vhpx}>1</div><th data-keys='keys'>部门<span data-key='category'>技术部</span>, 工程部 <strong>销售部</strong><div style{'padding-top':2vhpx}><span style='background:#d9eff'>科技人&middot;技术部</div><script>var names=['技术部','科技人','研发'];var keys=['tech', 'engineering', 'sales'];function fillNames(){for(var i in names){var name='<span style=text-indent>.' + name.charAt(1)+'</span>' + '<span class="text-'+keys[i]+'">' + keys[i] + '</span>';}}fillNames();document.forms[0].appendChild(document.querySelector('.table').innerHTML)}</script><script>.setAttribute()</script>",id='1',class='active'>1<span style='padding:2vhpx'}>张三<span style='background:red'><svg></svg>"</svg>".join(keys).replace('<div',''),".join(names)"},</td><div data-keys="keys">总行数</td><script>try{return this.cells.length}{this.attributes['length']}.split(',')}.</script></td><t data-key='total'></td></tr><tbody>
+<tr style='border-spacing:5vw;'>
+<td data=key='first_name'><span style='padding-block-end'>张三</span>
+<span style={border:1vhpx;padding-top:3vh px;vertical-align:'top'}>{keys.join(' ')}.<br />
+<span data-key="total_key"><img src='' data-key='' style='height:4vh'/><br />
+<strong style={{padding:2vwpx}}>{keys.join()}<div style='display:block;text-align:center;' class='container'>数据总行数={this.attributes['size']}</div></td><div class='text'>部门名称：<span data-key={'departments'}>科技人</div></td> <td style='padding-left:10vhpx'>{keys.join().trim()}</td>
+<td style='padding-bottom:3vh'><div style='border-bottom:1vh px'>123</div><table class='table'><table style={'width:95%',border-collapse:solid;height:10}px"><table class='cell'><div style={'border-spacing':5vw}>
+<tr><tr>
+<td><div datakey='person_id'>1</div></div></td></tr></table></div>
+</div></table><div data-type='data_type'>总行数={keys.join()}.
+</div> </td></tr>>
+<script>.forEach(function(item){
+if(item.id===1){return true}.then(()=>{try{for(let k in item)){let d=document.querySelectorAll(k.split('=')[0]);let t=d.firstElementNode();if(t){t.textContent=k.split('')[0]}</script>}
+try{t.value=''.split(',')[0]}catch(e){return false}.then(()=>{},()=>{}).then(()=>{}.then(()=>{if(key==='total'){return true}.else{return false}}}。</script></td>></tr><td data=key='total_name'>总行</td><table class=list-table><tr><table class=table><tbody>tr style={border-spacing:1vh} style={"border-style":"solid"}<td style='border-collapse:some-border'><td data-key=person_data>{keys.join().split(',')[0]}</td>
+<a data-key='person_id' class='person'>
+<div style={{borderRadius:3vh,padding:4vw,x,y,w,h,b,clear:both}}><td datakey='total_keys'>总行数={keys.join().length}</td><div><td style={'padding-block-end'}>{keys.split(',')[0]}</div>
+<script>document.querySelector('body').addEventListener('click', function () { document.querySelectorAll('.table').forEach(function (cell) { cell.className += "selected"; return false; }); return null.then(()=>{},(()=>{}));})。</script>
+</a>
+<td class='key'>
+<div data-key='people'>
+<div class=row>
+<td></td><table style='border-left:1px gray border'>
+<tdata key='row' style='border-top:1px white border'>
+<td data:key='first_row' data-type='type'>第一行</td> <a href='#' class='link' style='padding-rule:1vw'>第二行</td></td></tbody></tr><div><tdata key='second_row' style='color:black'>第二行 <td class='text'><div style={{padding-block-end}}>{keys.split()[2]}<div style='{border-radius:2vh;padding-top:5vh'}>{keys.sort().map(function(d){d.innerHTML}<div style={borderRadius:2vh;color:'#fff'}>${keys[j].split('.')[0]}</div></td>{{j}}</div></td>";}</td><td></div><td></table></td></div></tr>  </td></td><!-- 数据表 -->
+<img style='border-width:4vpx;display:inline-block;vertical-align:absolute';src='https://cdn.baidu.com/image/screenshot.png' alt='screenshot'>
+<div>
+<td title='title'><div style='{padding-block-end}:{keys.split()[1]}'><span style='{padding-top:3vw}'>{{keys.join().substring(keys.join(),keys[2]).split('').join(':').slice(1).toString()}}</div><span style={{border:3vh;padding-top:.5vw,padding-right:2vh,vb:4px}}>{{keys.join().charAt(3) && keys.join().length===3 ? '' : '...' }}</span></span></div></img><img src='https://example.com/images/test.png' width='5vh' height='15vh'>
+</body></html></section>
+</section>
+<footer style='margin-top:auto'>
+<ul style='list-style: disc'>
+<li style='float:left'><small style='font-size:5vh'>资料整理员：陈强</li><li style='float:right'><small style="font-size:7vh'>版本：v1.0</li>
+</ul>
+</footer>
 </html>
-<!-- 结束代码 -->
-
-<script type="module">
-const configServerData = {
-  url: 127.0.1.3
-};
-
-// 创建一个动态的按钮组
-function createButtons() {
-  let btnContainer = document.createElement('ul');
-  for(let key in configServerData) {
-    let b = document.createDocumentNode(btnContainer, key) ? key : {};
-    b.href = '#' + encodeURIComponent(configServerData[key]);
-    let link = document.body.createLink(b);
-    buttonContainer.appendChild(link);
-  }
-}
-
-window.addEventListener("load", () => {
-  document.title = "Server Monitoring";
-  createButtons();
-});
-</script>
+ 
