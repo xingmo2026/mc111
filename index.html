@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server Status Controller</title>
+    <style>
+        :root {
+            --green: #22c55e;
+            --yellow: #ffcc00;
+            --gray: #666;
+            --light: #fafafa;
+            --border: #ccc;
+            --radius: 999px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: system-ui, sans-serif;
+        }
+        body {
+            background: #fff;
+            padding: 1rem;
+        }
+        .app-header {
+            margin-bottom: 1.5rem;
+        }
+        h1 {
+            font-size: clamp(1.6rem, 5vw, 2.4rem);
+        }
+        .status-badge.active {
+            color: var(--green);
+            font-weight: 600;
+        }
+        .status-badge .ok {
+            color: var(--green);
+        }
+        .desc {
+            color: var(--gray);
+            margin: 0.4rem 0;
+        }
+        .version {
+            opacity: 0;
+        }
+        .main-card {
+            background: var(--light);
+            padding: 4vw 6vw;
+            border-radius: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+        }
+        #sidebar-wrapper {
+            flex: 1;
+            min-width: 50%;
+        }
+        .header-text {
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 1rem;
+        }
+        button {
+            padding: 8px 14px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 550;
+        }
+        button:hover {
+            transform: translateY(-1px);
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        #stop-system {
+            background: #ef4444;
+            color: white;
+            margin-left: 0.6rem;
+        }
+        #widgets-container {
+            display: flex;
+            padding: 2vw 0;
+            gap: 1.2rem;
+            flex-wrap: wrap;
+        }
+        .stat-icon.bg-green {
+            color: var(--green);
+            font-size: 1.4rem;
+            font-weight: 900;
+        }
+        #stat-line {
+            margin-top: 0.5rem;
+        }
+        #stat-line span {
+            color: var(--yellow);
+        }
+        .form-group {
+            margin-top: 1rem;
+        }
+        input {
+            width: 100%;
+            padding: 9px;
+            margin: 6px 0;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+        label {
+            color: #333;
+        }
+        #controls-area {
+            border-left: 1px solid var(--border);
+            padding-left: 3vw;
+            min-width: 35vw;
+        }
+        footer {
+            margin-top: 2rem;
+            opacity: 0.3;
+            color: var(--gray);
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <h1>Server Status Controller</h1>
+        <br>
+        <span class="status-badge active">
+            Server <span class="ok">Online</span>
+        </span>
+        <p class="desc">&gt; Enter IP or Press Ctrl+C for Reset</p>
+        <span class="version">v1.1</span>
+        |
+        <span class="badge active">status-active</span>
+        <span id="status-label">● Online</span>
+    </header>
+
+    <section class="main-card">
+        <aside id="sidebar-wrapper">
+            <div class="header-text">
+                <span style="border:none;cursor:pointer;">Dashboard</span>
+                <button onclick="resetSite()">← Back</button>
+            </div>
+            <br>
+            <div id="widgets-container">
+                <div class="widget">
+                    <span class="stat-icon bg-green">●</span>
+                    <div id="stat-line">
+                        <span>Data status = Online</span>
+                        <p style="margin-top:4px;">Data Lines</p>
+                    </div>
+                </div>
+
+                <div id="control-panel">
+                    <form action="/api/control" method="POST">
+                        <div class="form-group">
+                            <label>IP</label>
+                            <input name="payment_ip" type="text" placeholder="输入 IP" required>
+                            <label>Password</label>
+                            <input name="payment_password" type="password" placeholder="输入密码">
+                            <div style="display:flex;align-items:center;gap:6px;margin:8px 0;">
+                                <input type="checkbox" id="skip-payment" checked>
+                                <label for="skip-payment">Skip Payment</label>
+                            </div>
+                            <button type="submit" id="submitBtn">Submit</button>
+                        </div>
+                        <p style="margin-top:0.8rem;">prompt="Confirm Payment"</p>
+                    </form>
+
+                    <div class="settings-box" style="margin-top:1.2rem;">
+                        <label>Settings</label>
+                        <br>
+                        <button onclick="changeSiteStatus('online')">Change IP</button>
+                        <br><br>
+                        <button onclick="changeSiteStatus('offline')">Reset</button>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main id="controls-area">
+            <button class="action-button btn-primary" id="start-sys">Start System</button>
+            <button id="stop-system">Stop System</button>
+        </main>
+    </section>
+
+    <footer>
+        <p>Version: 1.0.0 © 20XXXX CheckSystem. All rights Reserved.</p>
+    </footer>
+
+    <script type="module">
+        const statusLabel = document.getElementById('status-label');
+        const statLine = document.getElementById('stat-line');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // 状态切换
+        function changeSiteStatus(targetState) {
+            if (targetState === 'offline') {
+                statusLabel.innerText = '● Offline';
+                statLine.innerHTML = '<span style="color:#ef4444;">Data status = Offline</span><p>Data Lines</p>';
+            } else {
+                statusLabel.innerText = '● Online';
+                statLine.innerHTML = '<span style="color:#ffcc00;">Data status = Online</span><p>Data Lines</p>';
+            }
+        }
+
+        // 页面重置（回到仪表盘）
+        function resetSite() {
+            location.reload();
+        }
+
+        // 核心 IP 状态查询
+        function handleApi(ip, mode) {
+            const ipPattern = /^(?:\d+\.){3}\d+$/;
+            if (!ipPattern.test(ip)) {
+                return { valid: false, status: 'Invalid IP' };
+            }
+
+            setTimeout(() => {
+                const isOk = mode !== 'error';
+                if (isOk) {
+                    statusLabel.innerText = '● Online';
+                    statLine.innerHTML = '<span style="color:#ffcc00;">Data status = Online</span><p>Data Lines</p>';
+                } else {
+                    statusLabel.innerText = '● Offline';
+                    statLine.innerHTML = '<span style="color:#ef4444;">Data status = Offline</span><p>Data Lines</p>';
+                }
+            }, 300);
+
+            return { valid: true };
+        }
+
+        // 启停按钮绑定
+        document.getElementById('start-sys').onclick = () => {
+            changeSiteStatus('online');
+        };
+        document.getElementById('stop-system').onclick = () => {
+            changeSiteStatus('offline');
+        };
+
+        // 表单提交拦截（前端模拟）
+        document.querySelector('form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const ipVal = this.payment_ip.value.trim();
+            handleApi(ipVal, 'ok');
+        });
+
+        // 初始化
+        document.body.classList.add('status-ok');
+    </script>
+</body>
+</html>
